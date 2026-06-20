@@ -15,10 +15,10 @@ COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Render PORT muhit o'zgaruvchisini beradi, Apache shu portni tinglashi kerak
-RUN echo 'Listen ${PORT}' >> /etc/apache2/ports.conf
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf
-
 EXPOSE 10000
 
-CMD bash -c "sed -i 's/Listen 80/Listen $PORT/g' /etc/apache2/ports.conf && sed -i 's/:80/:'$PORT'/g' /etc/apache2/sites-available/000-default.conf && apache2-foreground"
+# PORT muhit o'zgaruvchisi ishga tushish vaqtida (runtime) o'rnatiladi,
+# shuning uchun build vaqtida emas, balki CMD ichida sozlanadi
+CMD bash -c "echo \"Listen \$PORT\" > /etc/apache2/ports.conf && \
+    sed -i \"s/:80/:\$PORT/g\" /etc/apache2/sites-available/000-default.conf && \
+    apache2-foreground"
